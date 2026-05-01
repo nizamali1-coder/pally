@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DriveMod — The autonomous retrofit for tuggers you already own | Cyngn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0B;
+    --bg-2: #111115;
+    --surface: #16161C;
+    --surface-2: #1D1D24;
+    --border: #2A2A33;
+    --border-bright: #3A3A46;
+    --text: #F5F5F0;
+    --text-muted: #9B9BA3;
+    --text-dim: #6B6B73;
+    --accent: #FF5F1F;
+    --accent-soft: rgba(255, 95, 31, 0.12);
+    --accent-glow: rgba(255, 95, 31, 0.25);
+    --green: #3DD68C;
+    --yellow: #FFD600;
+
+    --display: 'Archivo', sans-serif;
+    --body: 'Manrope', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* === Background grain texture === */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* === NAV === */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 11, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--bg);
+    font-weight: 900;
+    transform: rotate(-12deg);
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-cta-secondary {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .nav-cta-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 10px 18px;
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .nav-cta-primary:hover {
+    background: #FF7A42;
+    transform: translateY(-1px);
+  }
+
+  /* === HERO === */
+  .hero {
+    padding: 80px 0 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -200px;
+    left: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
+    filter: blur(60px);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    gap: 64px;
+    align-items: start;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 24px;
+    padding: 6px 12px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 100px;
+  }
+  .hero-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  h1.hero-title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(52px, 6vw, 84px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    margin-bottom: 24px;
+  }
+  h1.hero-title .accent {
+    color: var(--accent);
+    font-style: italic;
+    position: relative;
+  }
+  h1.hero-title .underline {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 4px;
+    text-underline-offset: 8px;
+  }
+
+  .hero-sub {
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin-bottom: 40px;
+  }
+  .hero-sub strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 28px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-num {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .stat-num .unit {
+    color: var(--accent);
+    font-size: 28px;
+    margin-left: 2px;
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+
+  .hero-logos-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .hero-logos {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .logo-item {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--text-muted);
+    letter-spacing: -0.01em;
+    opacity: 0.85;
+    transition: opacity 0.2s, color 0.2s;
+  }
+  .logo-item:hover {
+    opacity: 1;
+    color: var(--text);
+  }
+
+  /* === CONFIGURATOR === */
+  .configurator {
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    border-radius: 12px;
+    padding: 32px;
+    position: sticky;
+    top: 96px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.04);
+    overflow: hidden;
+  }
+  .configurator::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .config-title-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .config-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+  .config-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .step-indicator {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: right;
+  }
+  .step-indicator strong { color: var(--accent); }
+
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 100px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    width: 20%;
+    transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .config-question {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .config-helper {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .config-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .config-option {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: left;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .config-option:hover {
+    border-color: var(--accent);
+    background: rgba(255, 95, 31, 0.06);
+  }
+  .config-option.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .config-option .arrow {
+    color: var(--text-dim);
+    font-family: var(--mono);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .config-option:hover .arrow {
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  .config-input-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .config-input {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  .config-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .config-input::placeholder {
+    color: var(--text-dim);
+  }
+
+  .config-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .config-back {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--body);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: color 0.2s;
+  }
+  .config-back:hover { color: var(--text); }
+  .config-back:disabled { opacity: 0; pointer-events: none; }
+
+  .config-submit {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 14px 24px;
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .config-submit:hover {
+    background: #FF7A42;
+    transform: translateY(-1px);
+  }
+  .config-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* === RESULT VIEW === */
+  .config-result {
+    text-align: left;
+  }
+  .result-headline {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 24px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .result-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .result-card {
+    background: linear-gradient(135deg, var(--accent-soft) 0%, transparent 100%);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .result-stat-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .result-stat-value {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 44px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .result-stat-detail {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .result-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+  }
+  .result-row .label { color: var(--text-muted); }
+  .result-row .value {
+    font-family: var(--mono);
+    font-weight: 500;
+    color: var(--text);
+  }
+  .result-row .value strong { color: var(--accent); }
+
+  .result-cta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .result-cta-primary {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 14px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .result-cta-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 14px;
+    border: 1px solid var(--border-bright);
+    border-radius: 6px;
+    font-family: var(--body);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .result-cta-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* === HOW IT WORKS === */
+  .section {
+    padding: 100px 0;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(36px, 4.5vw, 56px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 16px;
+    max-width: 800px;
+  }
+  .section-title .accent { color: var(--accent); font-style: italic; }
+  .section-sub {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin-bottom: 56px;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .step-card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-4px);
+  }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    margin-bottom: 24px;
+  }
+  .step-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: var(--accent);
+  }
+  .step-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .step-desc {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+  .step-meta {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .step-meta strong { color: var(--text); }
+
+  /* === MATH SECTION === */
+  .math-section {
+    background: linear-gradient(180deg, transparent 0%, var(--bg-2) 100%);
+  }
+  .math-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .math-text h2 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(40px, 5vw, 64px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .math-text p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .math-text strong { color: var(--text); font-weight: 600; }
+
+  .math-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .callout {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout-num {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 56px;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .callout-detail {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* === CUSTOMER PROOF === */
+  .proof-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .proof-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .proof-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+  .proof-customer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .proof-customer-name {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .proof-customer-vertical {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border: 1px solid var(--accent);
+    border-radius: 100px;
+  }
+  .proof-stat-big {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 64px;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .proof-stat-big .unit {
+    color: var(--accent);
+    font-size: 38px;
+  }
+  .proof-stat-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .proof-quote {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    font-style: italic;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .proof-attribution {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 12px;
+  }
+
+  /* === SPECS BAND === */
+  .specs-band {
+    background: var(--bg-2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 0;
+  }
+  .specs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  .spec {
+    border-left: 2px solid var(--accent);
+    padding-left: 20px;
+  }
+  .spec-num {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 42px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .spec-num .unit {
+    color: var(--text-muted);
+    font-size: 22px;
+    font-weight: 500;
+  }
+  .spec-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  /* === BOTTOM CTA === */
+  .bottom-cta {
+    padding: 120px 0;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at top, var(--accent-soft) 0%, transparent 60%),
+      var(--bg);
+    border-top: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .bottom-cta h2 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(48px, 6vw, 80px);
+    letter-spacing: -0.035em;
+    line-height: 1;
+    max-width: 900px;
+    margin: 0 auto 24px;
+  }
+  .bottom-cta h2 .accent {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .bottom-cta p {
+    font-size: 18px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .bottom-cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary-large {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 18px 36px;
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .btn-primary-large:hover {
+    background: #FF7A42;
+    transform: translateY(-2px);
+  }
+  .btn-secondary-large {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border-bright);
+    padding: 18px 36px;
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary-large:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* === FOOTER === */
+  footer {
+    padding: 48px 0;
+    border-top: 1px solid var(--border);
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 1100px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .configurator { position: static; }
+    .math-grid { grid-template-columns: 1fr; gap: 40px; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .proof-grid { grid-template-columns: 1fr; }
+    .specs-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .container { padding: 0 20px; }
+    .hero { padding: 48px 0 80px; }
+    .nav-links { display: none; }
+    .hero-stats { grid-template-columns: 1fr; gap: 16px; }
+    .specs-grid { grid-template-columns: 1fr; }
+    .stat-num { font-size: 36px; }
+  }
+
+  /* === ANIMATION === */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .reveal-1 { animation-delay: 0.1s; }
+  .reveal-2 { animation-delay: 0.2s; }
+  .reveal-3 { animation-delay: 0.3s; }
+  .reveal-4 { animation-delay: 0.4s; }
+  .reveal-5 { animation-delay: 0.5s; }
+
+  /* Notes badge for stakeholders */
+  .design-note {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(255, 95, 31, 0.4);
+    cursor: pointer;
+    user-select: none;
+  }
+  .design-note:hover { background: #FF7A42; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <span class="logo-mark">C</span>
+      cyngn
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#math">The math</a></li>
+      <li><a href="#proof">Customers</a></li>
+      <li><a href="#specs">Specs</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="#" class="nav-cta-secondary">Sign in</a>
+      <a href="#configurator" class="nav-cta-primary">Configure pilot →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="hero-eyebrow reveal reveal-1">Now deploying — Q2 2026</div>
+
+      <h1 class="hero-title reveal reveal-2">
+        Don't replace<br>
+        your tuggers.<br>
+        <span class="underline">Retrofit them.</span>
+      </h1>
+
+      <p class="hero-sub reveal reveal-3">
+        DriveMod turns the <strong>Motrec MT-160 tow tractors you already own</strong> into fully autonomous fleet — in <strong>90 days</strong>, with no infrastructure changes, no magnetic strips, no rip-and-replace.
+      </p>
+
+      <div class="hero-stats reveal reveal-4">
+        <div class="stat">
+          <div class="stat-num">+33<span class="unit">%</span></div>
+          <div class="stat-label">Productivity per shift</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">−64<span class="unit">%</span></div>
+          <div class="stat-label">Labor cost per route</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">18<span class="unit">mo</span></div>
+          <div class="stat-label">Average payback</div>
+        </div>
+      </div>
+
+      <div class="reveal reveal-5">
+        <div class="hero-logos-label">Operating today at</div>
+        <div class="hero-logos">
+          <span class="logo-item">G&amp;J Pepsi</span>
+          <span class="logo-item">DHL</span>
+          <span class="logo-item">Coats</span>
+          <span class="logo-item">Vann Family Orchards</span>
+          <span class="logo-item">U.S. Continental</span>
+          <span class="logo-item">Arauco</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIGURATOR -->
+    <div id="configurator" class="configurator reveal reveal-3">
+      <div class="config-header">
+        <div class="config-title-row">
+          <div class="config-eyebrow">→ Pilot configurator</div>
+          <div class="config-title">Build your pilot</div>
+        </div>
+        <div class="step-indicator">
+          Step <strong id="stepNum">1</strong> of <span>5</span>
+        </div>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div id="configContent">
+        <!-- Dynamic content injected by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="section">
+  <div class="container">
+    <div class="section-eyebrow">→ How it works</div>
+    <h2 class="section-title">Three steps. <span class="accent">Ninety days.</span> Zero infrastructure.</h2>
+    <p class="section-sub">No magnetic strips on the floor. No QR codes on the walls. DriveMod uses 3D LiDAR and onboard intelligence — so deployment fits your timeline, not your facility shutdown schedule.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01 — Assess</div>
+        <div class="step-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <div class="step-title">Workflow audit & ROI model</div>
+        <div class="step-desc">Our solutions engineers walk your facility, audit current tugger routes, and build a customer-specific payback model. You see exactly which routes produce ROI before any capital commits.</div>
+        <div class="step-meta">
+          <span>Timeline</span>
+          <strong>2 weeks</strong>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">02 — Retrofit</div>
+        <div class="step-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div class="step-title">DriveMod retrofit on existing fleet</div>
+        <div class="step-desc">We integrate DriveMod onto your Motrec MT-160 tuggers — the same vehicles your team already operates and maintains. No new hardware platform. No retraining the maintenance crew.</div>
+        <div class="step-meta">
+          <span>Timeline</span>
+          <strong>4–6 weeks</strong>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">03 — Deploy</div>
+        <div class="step-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+        </div>
+        <div class="step-title">Live ops with onboard FMS</div>
+        <div class="step-desc">Vehicles ship with on-vehicle displays, cloud FMS, and tablet stations throughout your facility. Your team controls dispatch like elevator buttons. WMS integration included.</div>
+        <div class="step-meta">
+          <span>Timeline</span>
+          <strong>2–4 weeks</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE MATH -->
+<section id="math" class="section math-section">
+  <div class="container">
+    <div class="math-grid">
+      <div class="math-text">
+        <div class="section-eyebrow">→ The math</div>
+        <h2>Not automating costs <span style="color: var(--accent); font-style: italic;">4× more</span> than retrofitting.</h2>
+        <p>A single tugger driver in a 24/7 facility costs roughly <strong>$165,000/year fully loaded</strong> across 3 shifts. Multiply by fleet size and the number gets uncomfortable fast.</p>
+        <p>DriveMod retrofits don't replace your operators — they redeploy them. Your headcount moves to higher-judgment work (loading, picking, troubleshooting) while the tugger does what tuggers do best: <strong>repeat the same route, perfectly, forever, without complaint.</strong></p>
+        <p style="color: var(--text-dim); font-size: 14px; margin-top: 24px;">Source: Cyngn customer ROI analyses, 2024–2026.</p>
+      </div>
+
+      <div class="math-callouts">
+        <div class="callout">
+          <div class="callout-num">$165K</div>
+          <div class="callout-label">Annual cost / tugger / 24-7 facility</div>
+          <div class="callout-detail">Fully-loaded labor: 3 shifts × ~$55K/year per operator including benefits, overtime, and turnover replacement.</div>
+        </div>
+        <div class="callout">
+          <div class="callout-num">−64%</div>
+          <div class="callout-label">Average labor cost reduction</div>
+          <div class="callout-detail">Across deployed Cyngn customers, autonomous tugger routes reduced direct labor cost by an average of 64%.</div>
+        </div>
+        <div class="callout">
+          <div class="callout-num">12,000<span style="font-size: 32px; color: var(--text-muted);"> lb</span></div>
+          <div class="callout-label">Train capacity per tugger</div>
+          <div class="callout-detail">Multi-cart tugger trains. Auto-unhitch. Indoor and outdoor. WMS-integrated mission orchestration.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CUSTOMER PROOF -->
+<section id="proof" class="section">
+  <div class="container">
+    <div class="section-eyebrow">→ Operating today</div>
+    <h2 class="section-title">The fleet is <span class="accent">already running.</span></h2>
+    <p class="section-sub">Six commercial deployments across food &amp; beverage, agriculture, manufacturing, and logistics. These aren't pilots. These are production fleets running second shifts you don't have to staff.</p>
+
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="proof-customer">
+          <div class="proof-customer-name">U.S. Continental</div>
+          <div class="proof-customer-vertical">Manufacturing</div>
+        </div>
+        <div class="proof-stat-big">4<span class="unit">×</span></div>
+        <div class="proof-stat-label">Increase in material movement efficiency at 100K sq ft facility</div>
+        <div class="proof-quote">"DriveMod let us reallocate labor away from repetitive transport routes. The capacity gain showed up in our throughput numbers within the first quarter."</div>
+        <div class="proof-attribution">— Operations leadership, U.S. Continental</div>
+      </div>
+
+      <div class="proof-card">
+        <div class="proof-customer">
+          <div class="proof-customer-name">Coats</div>
+          <div class="proof-customer-vertical">Industrial</div>
+        </div>
+        <div class="proof-stat-big">+High</div>
+        <div class="proof-stat-label">Load capacity unlock — heavy components &amp; bulk orders</div>
+        <div class="proof-quote">"Cyngn's self-driving tugger was the perfect solution to support our strategy of advancing automation and incorporating scalable technology seamlessly into our operations."</div>
+        <div class="proof-attribution">— Coats team statement</div>
+      </div>
+
+      <div class="proof-card">
+        <div class="proof-customer">
+          <div class="proof-customer-name">G&amp;J Pepsi</div>
+          <div class="proof-customer-vertical">Food &amp; Beverage</div>
+        </div>
+        <div class="proof-stat-big">#1</div>
+        <div class="proof-stat-label">Largest independent Pepsi bottler in the U.S. — DriveMod deployed across distribution operations</div>
+        <div class="proof-quote">"We're scaling autonomous material handling across our beverage distribution footprint. DriveMod is the platform we're standardizing on."</div>
+        <div class="proof-attribution">— Cyngn customer announcement, 2025–2026</div>
+      </div>
+
+      <div class="proof-card">
+        <div class="proof-customer">
+          <div class="proof-customer-name">Vann Family Orchards</div>
+          <div class="proof-customer-vertical">Agriculture</div>
+        </div>
+        <div class="proof-stat-big">4<span class="unit">×</span></div>
+        <div class="proof-stat-label">DriveMod Tuggers deployed across connected processing facilities</div>
+        <div class="proof-quote">"Hybrid workflow — DriveMod handles material transport between storage and processing zones, our team focuses on loading and product handling."</div>
+        <div class="proof-attribution">— Vann Family Orchards deployment, March 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECS BAND -->
+<section id="specs" class="specs-band">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 40px;">
+      <div>
+        <div class="section-eyebrow" style="margin-bottom: 8px;">→ Hardware platform</div>
+        <h3 style="font-family: var(--display); font-weight: 900; font-size: 36px; letter-spacing: -0.025em;">DriveMod-enabled Motrec MT-160</h3>
+      </div>
+      <a href="#" style="color: var(--accent); font-family: var(--mono); font-size: 13px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.1em;">Full datasheet →</a>
+    </div>
+
+    <div class="specs-grid">
+      <div class="spec">
+        <div class="spec-num">12,000<span class="unit"> lb</span></div>
+        <div class="spec-label">Tow capacity</div>
+      </div>
+      <div class="spec">
+        <div class="spec-num">360<span class="unit">°</span></div>
+        <div class="spec-label">3D LiDAR perception</div>
+      </div>
+      <div class="spec">
+        <div class="spec-num">In/Out<span class="unit">door</span></div>
+        <div class="spec-label">All-environment operation</div>
+      </div>
+      <div class="spec">
+        <div class="spec-num">0<span class="unit"> markers</span></div>
+        <div class="spec-label">No magnetic strips. No infrastructure.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Stop hiring drivers you<br>can't <span class="accent">find.</span></h2>
+    <p>The labor market won't get easier. The math won't get cheaper to ignore. Configure your DriveMod pilot in 60 seconds and we'll send you a customer-specific ROI model within 24 hours.</p>
+    <div class="bottom-cta-buttons">
+      <a href="#configurator" class="btn-primary-large">Configure my pilot →</a>
+      <a href="#" class="btn-secondary-large">Talk to a solutions engineer</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container footer-inner">
+    <div>© 2026 Cyngn Inc. (NASDAQ: CYN) — Mountain View, CA</div>
+    <div style="display: flex; gap: 24px;">
+      <a href="#" style="color: var(--text-dim); text-decoration: none;">Privacy</a>
+      <a href="#" style="color: var(--text-dim); text-decoration: none;">Terms</a>
+      <a href="#" style="color: var(--text-dim); text-decoration: none;">Investors</a>
+    </div>
+  </div>
+</footer>
+
+<div class="design-note" onclick="alert('REIMAGINED HOMEPAGE — concept by Nizam Ali for Cyngn Head of RevOps role.\n\nKey moves:\n• Single-product hero (Tugger only)\n• Configurator embedded in hero, not behind a form\n• ROI math front and center\n• Customer proof as outcomes, not logos\n• \"Retrofit, don\\'t replace\" positioning\n\nFor strategic discussion only.')">
+  ⚡ Concept demo — click for notes
+</div>
+
+<script>
+  // ============ CONFIGURATOR LOGIC ============
+  const STEPS = [
+    {
+      type: 'select',
+      key: 'size',
+      question: 'How big is your facility?',
+      helper: 'Square footage of the main operations area where tugger routes run.',
+      options: [
+        { label: 'Under 50,000 sq ft', value: 'small', mult: 0.6 },
+        { label: '50,000 – 200,000 sq ft', value: 'medium', mult: 1.0 },
+        { label: '200,000 – 500,000 sq ft', value: 'large', mult: 1.6 },
+        { label: '500,000+ sq ft (multi-building)', value: 'xlarge', mult: 2.4 }
+      ]
+    },
+    {
+      type: 'select',
+      key: 'fleet',
+      question: 'What does your tugger fleet look like today?',
+      helper: 'Approximate active vehicle count across the facility.',
+      options: [
+        { label: '1 – 5 tuggers', value: '1-5', units: 3 },
+        { label: '6 – 15 tuggers', value: '6-15', units: 10 },
+        { label: '16 – 50 tuggers', value: '16-50', units: 30 },
+        { label: '50+ tuggers', value: '50+', units: 70 },
+        { label: "We don't have tuggers yet — evaluating new build", value: 'none', units: 8 }
+      ]
+    },
+    {
+      type: 'select',
+      key: 'shifts',
+      question: 'How many shifts do you run?',
+      helper: 'Active operations per 24-hour cycle.',
+      options: [
+        { label: '1 shift / day', value: '1', mult: 1.0 },
+        { label: '2 shifts / day', value: '2', mult: 1.85 },
+        { label: '24/7 — three shifts', value: '3', mult: 2.6 }
+      ]
+    },
+    {
+      type: 'select',
+      key: 'pain',
+      question: 'What\'s pushing you to look at autonomy?',
+      helper: 'Pick the one that hurts most. We\'ll tailor the pilot to it.',
+      options: [
+        { label: 'Can\'t hire or retain tugger operators', value: 'labor' },
+        { label: 'Safety incidents on the floor', value: 'safety' },
+        { label: 'Need to scale throughput without adding headcount', value: 'throughput' },
+        { label: 'Reducing operational cost / margin pressure', value: 'cost' },
+        { label: 'Strategic — future-proofing operations', value: 'strategic' }
+      ]
+    },
+    {
+      type: 'form',
+      key: 'contact',
+      question: 'Where do we send your pilot ROI model?',
+      helper: 'A solutions engineer will follow up within 24 hours. No spam, no sequences — one human reply.',
+      fields: [
+        { name: 'name', placeholder: 'Full name' },
+        { name: 'email', placeholder: 'Work email', type: 'email' },
+        { name: 'company', placeholder: 'Company name' },
+        { name: 'title', placeholder: 'Your title' }
+      ]
+    }
+  ];
+
+  let currentStep = 0;
+  const answers = {};
+
+  const stepNumEl = document.getElementById('stepNum');
+  const progressFill = document.getElementById('progressFill');
+  const configContent = document.getElementById('configContent');
+
+  function updateProgress() {
+    const pct = ((currentStep + 1) / (STEPS.length + 1)) * 100;
+    progressFill.style.width = pct + '%';
+    stepNumEl.textContent = Math.min(currentStep + 1, STEPS.length);
+  }
+
+  function renderStep() {
+    if (currentStep >= STEPS.length) {
+      renderResult();
+      return;
+    }
+
+    const step = STEPS[currentStep];
+    let html = `
+      <div class="config-question">${step.question}</div>
+      <div class="config-helper">${step.helper}</div>
+    `;
+
+    if (step.type === 'select') {
+      html += '<div class="config-options">';
+      step.options.forEach((opt, i) => {
+        html += `
+          <button class="config-option" data-step="${currentStep}" data-idx="${i}">
+            <span>${opt.label}</span>
+            <span class="arrow">→</span>
+          </button>
+        `;
+      });
+      html += '</div>';
+      html += `
+        <div class="config-nav">
+          <button class="config-back" ${currentStep === 0 ? 'disabled' : ''}>← Back</button>
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--text-dim);">Click to continue →</span>
+        </div>
+      `;
+    } else if (step.type === 'form') {
+      html += '<div class="config-input-row">';
+      step.fields.forEach(f => {
+        html += `<input class="config-input" type="${f.type || 'text'}" name="${f.name}" placeholder="${f.placeholder}" />`;
+      });
+      html += '</div>';
+      html += `
+        <div class="config-nav">
+          <button class="config-back">← Back</button>
+          <button class="config-submit" id="submitBtn">Get my ROI estimate →</button>
+        </div>
+      `;
+    }
+
+    configContent.innerHTML = html;
+    updateProgress();
+
+    // Wire up handlers
+    document.querySelectorAll('.config-option').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const step = STEPS[currentStep];
+        const idx = parseInt(btn.dataset.idx);
+        answers[step.key] = step.options[idx];
+        currentStep++;
+        renderStep();
+      });
+    });
+
+    const backBtn = document.querySelector('.config-back');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+          currentStep--;
+          renderStep();
+        }
+      });
+    }
+
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', () => {
+        const inputs = document.querySelectorAll('.config-input');
+        const contact = {};
+        let valid = true;
+        inputs.forEach(input => {
+          contact[input.name] = input.value;
+          if (!input.value) valid = false;
+        });
+        if (!valid) {
+          alert('Please fill in all fields so we can route your ROI model correctly.');
+          return;
+        }
+        answers.contact = contact;
+        currentStep++;
+        renderStep();
+      });
+    }
+  }
+
+  function renderResult() {
+    // Calculate fake ROI based on answers
+    const sizeMult = answers.size?.mult || 1.0;
+    const units = answers.fleet?.units || 5;
+    const shiftsMult = answers.shifts?.mult || 1.0;
+
+    // Annual labor savings = units × shiftsMult × ~$35K (64% of $55K) × sizeMult adjustment
+    const baseSavings = units * shiftsMult * 35000 * (sizeMult * 0.7 + 0.3);
+    const annualSavings = Math.round(baseSavings / 10000) * 10000; // round to 10K
+
+    // Payback months
+    const paybackMonths = annualSavings > 1500000 ? 11 :
+                         annualSavings > 800000 ? 14 :
+                         annualSavings > 400000 ? 17 : 22;
+
+    // Pilot recommendation
+    const pilotSize = units >= 30 ? '4–6 vehicles' :
+                     units >= 10 ? '2–4 vehicles' : '1–2 vehicles';
+
+    const formatNum = n => '$' + n.toLocaleString();
+
+    const sizeLabel = answers.size?.label || '';
+    const fleetLabel = answers.fleet?.label || '';
+    const shiftsLabel = answers.shifts?.label || '';
+    const painMap = {
+      labor: 'labor shortage',
+      safety: 'safety',
+      throughput: 'throughput scaling',
+      cost: 'cost reduction',
+      strategic: 'strategic automation'
+    };
+    const painLabel = painMap[answers.pain?.value] || 'operations';
+    const firstName = (answers.contact?.name || 'there').split(' ')[0];
+
+    configContent.innerHTML = `
+      <div class="config-result">
+        <div class="result-headline">${firstName}, here's your estimate.</div>
+        <div class="result-sub">Based on a ${sizeLabel.toLowerCase()} facility, ${fleetLabel.toLowerCase()}, ${shiftsLabel.toLowerCase()}, prioritizing ${painLabel}.</div>
+
+        <div class="result-card">
+          <div class="result-stat-label">Estimated annual labor savings</div>
+          <div class="result-stat-value">${formatNum(annualSavings)}</div>
+          <div class="result-stat-detail">Range based on Cyngn customer benchmarks. Detailed model arrives within 24 hours.</div>
+        </div>
+
+        <div class="result-divider"></div>
+
+        <div class="result-row">
+          <span class="label">Recommended pilot size</span>
+          <span class="value"><strong>${pilotSize}</strong></span>
+        </div>
+        <div class="result-row">
+          <span class="label">Estimated payback</span>
+          <span class="value"><strong>${paybackMonths} months</strong></span>
+        </div>
+        <div class="result-row">
+          <span class="label">Time to first deployment</span>
+          <span class="value"><strong>~90 days</strong></span>
+        </div>
+        <div class="result-row">
+          <span class="label">Hardware platform</span>
+          <span class="value">Motrec MT-160</span>
+        </div>
+
+        <div class="result-cta-stack">
+          <button class="result-cta-primary" onclick="alert('In a live build: this triggers a Salesforce/HubSpot lead create with full configurator context, books a calendar slot via Chili Piper, and triggers a Slack alert to the assigned solutions engineer. Email confirmation sent automatically.')">📅 Schedule a 30-min strategy call</button>
+          <button class="result-cta-secondary" onclick="alert('In a live build: this generates a personalized PDF ROI model with the customer-specific math, gated download, and adds the contact to a 7-day nurture sequence with case studies matching their vertical.')">📊 Email me the detailed ROI model</button>
+        </div>
+      </div>
+    `;
+
+    progressFill.style.width = '100%';
+    stepNumEl.textContent = '5';
+  }
+
+  // Initial render
+  renderStep();
+
+  // Smooth scroll behavior
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
